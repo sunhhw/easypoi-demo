@@ -9,8 +9,10 @@ import com.example.my.excel.vo.CreditDebt;
 import com.example.my.excel.vo.ExcelVo;
 import com.example.my.excel.vo.IndustryInfo;
 import com.example.my.file.FileTypeUtil;
+import com.example.my.file.FileUploadUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +33,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/excel")
 public class ExcelController {
+
+    @Value("${file.filePath}")
+    private String uploadPath;
 
     /**
      * 多 sheet 导出
@@ -134,7 +139,7 @@ public class ExcelController {
 
         ExcelImportResult<CreditDebt> result = EasyPoiUtil.checkExcel(file, 0, 0, 1, CreditDebt.class);
 
-        ExcelImportResult<IndustryInfo> result2= EasyPoiUtil.checkExcel(file, 1, 0, 1, IndustryInfo.class);
+        ExcelImportResult<IndustryInfo> result2 = EasyPoiUtil.checkExcel(file, 1, 0, 1, IndustryInfo.class);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -157,6 +162,21 @@ public class ExcelController {
         }
 
         return "false";
+    }
+
+    /**
+     * excel 文件上传
+     *
+     * @param file 文件
+     * @return {@link String}
+     */
+    @GetMapping("/upload")
+    public String upload(@RequestParam("file") MultipartFile file) throws IOException {
+
+        // 上传并返回新文件名称
+        String fileName = FileUploadUtil.upload(uploadPath, file);
+
+        return fileName;
     }
 
 
